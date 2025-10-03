@@ -103,17 +103,28 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 1. **From Contracts**:
    - Each contract file → contract test task [P]
    - Each endpoint → implementation task
-   
+
 2. **From Data Model**:
    - Each entity → model creation task [P]
    - Relationships → service layer tasks
-   
+
 3. **From User Stories**:
    - Each story → integration test [P]
    - Quickstart scenarios → validation tasks
 
-4. **Ordering**:
+4. **For Gallery Entries** (per constitution):
+   - Environment setup → setup script task
+   - Duct execution → datalad run + duct command script task
+   - Resource stats → verify info.json generated task
+   - Plot rendering → global render test with info.json path task
+   - Provenance → verify datalad run records task
+   - Metadata → metadata.json creation (with info.json path) task
+   - Documentation → entry README task
+   - Each entry → full regeneration validation test (setup → execute → render)
+
+5. **Ordering**:
    - Setup → Tests → Models → Services → Endpoints → Polish
+   - Gallery entries: Setup → Execute (verify info.json) → Render → Validate provenance
    - Dependencies block parallel execution
 
 ## Validation Checklist

@@ -47,7 +47,32 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+**I. Reproducibility-First (NON-NEGOTIABLE)**
+- [ ] All gallery entries can be fully reproduced from scratch
+- [ ] Duct commands documented and re-runnable
+- [ ] Con-duct plots regeneratable from duct outputs
+- [ ] All operations use `datalad run` for provenance
+- [ ] Entry validity verified by regeneration test
+
+**II. Automation Over Manual Steps**
+- [ ] Gallery generation fully automated
+- [ ] Manual steps limited to: curation, initial setup, debugging
+- [ ] CI/CD validates reproducibility
+- [ ] Scripts preferred over documentation for operations
+
+**III. Test-First Development**
+- [ ] Tests written before implementation
+- [ ] Gallery entries serve as reproducibility test cases
+- [ ] Red-Green-Refactor cycle followed
+- [ ] No implementation without failing tests
+
+**IV. Simplicity & Maintainability**
+- [ ] Code readable by non-experts
+- [ ] Simple solutions over clever ones
+- [ ] Common design patterns used
+- [ ] "Why" documented, not "what"
+- [ ] Small atomic changes
+- [ ] YAGNI principle applied
 
 ## Project Structure
 

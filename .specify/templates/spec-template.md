@@ -82,6 +82,19 @@ When creating this spec from a user prompt:
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
 
+### Gallery Entry Requirements *(include if feature adds/modifies gallery entries)*
+*Per constitution: Gallery Entry Standards section*
+
+- [ ] **Environment setup**: How to prepare environment for duct command (data prep, dependencies, containers, etc.)
+- [ ] **Execution command**: Datalad run + duct command specified
+- [ ] **Resource stats**: Required duct outputs identified (includes <prefix>info.json)
+- [ ] **Plot generation**: Automated via global render (info.json path in metadata)
+- [ ] **Metadata**: Entry name, description, versions, info.json path specified
+- [ ] **Provenance**: Datalad run usage planned for execution and plotting
+- [ ] **Documentation**: Entry README content outlined
+- [ ] **Naming**: Descriptive kebab-case name defined (e.g., `high-memory-python-sort`)
+- [ ] **Reproducibility**: Regeneration test scenario defined (setup → execute → render plots)
+
 ---
 
 ## Review & Acceptance Checklist
