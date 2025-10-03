@@ -31,6 +31,16 @@ class GalleryEntry:
             command_script=entry_dir / "command.sh",
         )
 
+    @property
+    def has_command_script(self) -> bool:
+        """Returns True if command.sh exists in entry directory."""
+        return self.command_script.exists()
+
+    @property
+    def skip_execution(self) -> bool:
+        """Returns True if execution should be skipped (no command.sh)."""
+        return not self.has_command_script
+
     def validate(self) -> bool:
         """Validate that required files exist and are executable."""
         if not self.path.is_dir():

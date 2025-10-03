@@ -30,52 +30,88 @@ def validate_output_path(output_path: Path) -> bool:
 
 def process_entry(entry, output_path):
     """Process a single gallery entry: execute scripts, generate plot, prepare for rendering."""
+    import json
+
     logger.info(f"Executing entry: {entry.name}")
 
-    # Run setup.sh
-    logger.info("  Running setup.sh...")
-    success, stdout, stderr = execute_script(entry.setup_script, entry.path)
-    if not success:
-        logger.warning(f"Warning: Entry '{entry.name}' skipped - setup.sh failed with exit code 1")
-        return False
+    # Check if we should skip execution (no command.sh)
+    if entry.skip_execution:
+        logger.info("  Skipping execution (no command.sh)")
+        logger.info("  Validating existing logs...")
 
-    # Run command.sh
-    logger.info("  Running command.sh...")
-    success, stdout, stderr = execute_script(entry.command_script, entry.path)
-    if not success:
-        logger.warning(f"Warning: Entry '{entry.name}' skipped - command.sh failed")
-        return False
-
-    # Read command text for display
-    entry.command_text = read_command_text(entry.command_script)
-
-    # Find usage.json - duct creates files with prefix, need to find actual file
-    # Look for info.json to get the correct path
-    import json
-    import glob
-
-    info_files = list(entry.path.glob(".duct/*info.json"))
-    if not info_files:
-        logger.warning(f"Warning: Entry '{entry.name}' skipped - no duct info.json found")
-        return False
-
-    try:
-        info_data = json.loads(info_files[0].read_text())
-        usage_path = info_data.get("output_paths", {}).get("usage")
-        if usage_path:
-            entry.usage_json = entry.path / usage_path
-        else:
-            logger.warning(f"Warning: Entry '{entry.name}' skipped - usage path not in info.json")
+        # Validate that logs exist
+        info_files = list(entry.path.glob(".duct/*info.json"))
+        if not info_files:
+            logger.warning(f"Warning: Entry '{entry.name}' skipped - command.sh absent but info.json missing")
             return False
-    except Exception as e:
-        logger.warning(f"Warning: Entry '{entry.name}' skipped - failed to parse info.json: {e}")
-        return False
 
-    if not entry.usage_json.exists():
-        logger.warning(f"Warning: Entry '{entry.name}' skipped - usage.json not found at {entry.usage_json}")
-        return False
+        # Read usage.json path from info.json
+        try:
+            info_data = json.loads(info_files[0].read_text())
+            usage_path = info_data.get("output_paths", {}).get("usage")
+            if usage_path:
+                entry.usage_json = entry.path / usage_path
+            else:
+                logger.warning(f"Warning: Entry '{entry.name}' skipped - command.sh absent but usage path not in info.json")
+                return False
+        except Exception as e:
+            logger.warning(f"Warning: Entry '{entry.name}' skipped - command.sh absent but failed to parse info.json: {e}")
+            return False
 
-    # Generate plot
+        # Validate usage.json exists
+        if not entry.usage_json.exists():
+            logger.warning(f"Warning: Entry '{entry.name}' skipped - command.sh absent but usage.json missing at {entry.usage_json}")
+            return False
+
+        # Read command text from existing logs if available, otherwise empty
+        if entry.command_script.exists():
+            entry.command_text = read_command_text(entry.command_script)
+        else:
+            entry.command_text = "# Command not available (skip execution mode)"
+
+    else:
+        # Execute mode: run setup.sh and command.sh
+        # Run setup.sh
+        logger.info("  Running setup.sh...")
+        success, stdout, stderr = execute_script(entry.setup_script, entry.path)
+        if not success:
+            logger.warning(f"Warning: Entry '{entry.name}' skipped - setup.sh failed with exit code 1")
+            return False
+
+        # Run command.sh
+        logger.info("  Running command.sh...")
+        success, stdout, stderr = execute_script(entry.command_script, entry.path)
+        if not success:
+            logger.warning(f"Warning: Entry '{entry.name}' skipped - command.sh failed")
+            return False
+
+        # Read command text for display
+        entry.command_text = read_command_text(entry.command_script)
+
+        # Find usage.json - duct creates files with prefix, need to find actual file
+        # Look for info.json to get the correct path
+        info_files = list(entry.path.glob(".duct/*info.json"))
+        if not info_files:
+            logger.warning(f"Warning: Entry '{entry.name}' skipped - no duct info.json found")
+            return False
+
+        try:
+            info_data = json.loads(info_files[0].read_text())
+            usage_path = info_data.get("output_paths", {}).get("usage")
+            if usage_path:
+                entry.usage_json = entry.path / usage_path
+            else:
+                logger.warning(f"Warning: Entry '{entry.name}' skipped - usage path not in info.json")
+                return False
+        except Exception as e:
+            logger.warning(f"Warning: Entry '{entry.name}' skipped - failed to parse info.json: {e}")
+            return False
+
+        if not entry.usage_json.exists():
+            logger.warning(f"Warning: Entry '{entry.name}' skipped - usage.json not found at {entry.usage_json}")
+            return False
+
+    # Generate plot (both modes)
     logger.info("  Generating plot...")
     plots_dir = entry.path / "plots"
     entry.plot_path = generate_plot(entry.usage_json, plots_dir)
