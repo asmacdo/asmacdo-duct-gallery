@@ -28,7 +28,6 @@ htmlcov/
 
 # Duct outputs
 .duct/
-plots/
 
 # IDEs
 .vscode/
