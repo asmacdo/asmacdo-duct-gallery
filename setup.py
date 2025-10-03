@@ -12,7 +12,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "con-duct-gallery=src.gallery_render:main",
+            "con-duct-gallery=src.cli:main",
         ],
     },
 )
