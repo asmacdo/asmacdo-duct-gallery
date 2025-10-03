@@ -27,3 +27,13 @@ exit 0
 ![Plot](tests/fixtures/gallery/example-2/plots/usage.png)
 
 ---
+
+## Entry: skip-execution-example
+
+```bash
+# Command not available (skip execution mode)
+```
+
+![Plot](tests/fixtures/gallery/skip-execution-example/plots/usage.png)
+
+---

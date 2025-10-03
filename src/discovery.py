@@ -28,10 +28,23 @@ def discover_entries(gallery_dir: Path) -> List[GalleryEntry]:
             continue
 
         entry = GalleryEntry.from_directory(entry_dir)
-        if entry.validate():
+
+        # Basic validation: entry directory must exist
+        if not entry.path.is_dir():
+            logger.warning(f"Skipping invalid entry: {entry.name}")
+            continue
+
+        # For execute mode: validate required files
+        # For skip mode: just accept the entry, validation happens in process_entry
+        if entry.has_command_script:
+            if entry.validate():
+                entries.append(entry)
+                logger.info(f"Discovered entry: {entry.name}")
+            else:
+                logger.warning(f"Skipping invalid entry: {entry.name}")
+        else:
+            # Skip mode entry - accept it, will be validated during processing
             entries.append(entry)
             logger.info(f"Discovered entry: {entry.name}")
-        else:
-            logger.warning(f"Skipping invalid entry: {entry.name}")
 
     return entries
