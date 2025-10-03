@@ -26,8 +26,7 @@ wheels/
 htmlcov/
 .tox/
 
-# Duct outputs
-.duct/
+# Duct outputs (none - we track all outputs for reproducibility)
 
 # IDEs
 .vscode/
