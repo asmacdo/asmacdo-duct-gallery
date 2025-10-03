@@ -10,7 +10,7 @@ duct -p .duct/run --sample-interval 0.05 --report-interval 0.1 --clobber -- bash
 exit 0
 ```
 
-![Plot](tests/fixtures/gallery/example-1/plots/usage.png)
+![Plot](entries/example-1/plots/usage.png)
 
 ---
 
@@ -24,6 +24,7 @@ duct -p .duct/run --sample-interval 0.05 --report-interval 0.1 --clobber -- bash
 exit 0
 ```
 
-![Plot](tests/fixtures/gallery/example-2/plots/usage.png)
+![Plot](entries/example-2/plots/usage.png)
 
 ---
+
