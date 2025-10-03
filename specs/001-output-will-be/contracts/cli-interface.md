@@ -5,11 +5,11 @@
 con-duct-gallery [OPTIONS]
 ```
 
-## Required Arguments
-- `-o, --output PATH` - Output markdown file path
-
 ## Optional Arguments
 - `--gallery-dir PATH` - Gallery directory to scan (default: `./gallery`)
+
+## Output Location
+- Always writes to `README.md` in repository root (current working directory)
 
 ## Exit Codes
 - `0` - Success, markdown generated
@@ -29,7 +29,7 @@ con-duct-gallery [OPTIONS]
 
 ### Basic Usage
 ```bash
-con-duct-gallery -o gallery.md
+con-duct-gallery
 ```
 
 **Output**:
@@ -48,29 +48,17 @@ Executing entry: example-3
   Running setup.sh...
   Running command.sh...
   Generating plot...
-Generated markdown: gallery.md (3 entries)
+Generated markdown: README.md (3 entries)
 ```
 
 ### Custom Gallery Directory
 ```bash
-con-duct-gallery -o output.md --gallery-dir /data/experiments
+con-duct-gallery --gallery-dir /data/experiments
 ```
-
-### Error: Invalid Output Path
-```bash
-con-duct-gallery -o /nonexistent/dir/output.md
-```
-
-**stderr**:
-```
-Error: Output path invalid - parent directory does not exist: /nonexistent/dir
-```
-
-**Exit code**: 1
 
 ### Warning: Entry Execution Failed
 ```bash
-con-duct-gallery -o output.md
+con-duct-gallery
 ```
 
 **stderr**:
@@ -86,14 +74,14 @@ Executing entry: good-entry
   Running setup.sh...
   Running command.sh...
   Generating plot...
-Generated markdown: output.md (1 entry)
+Generated markdown: README.md (1 entry)
 ```
 
 **Exit code**: 0 (warnings don't cause failure)
 
 ### Error: No Entries Found
 ```bash
-con-duct-gallery -o output.md --gallery-dir empty/
+con-duct-gallery --gallery-dir empty/
 ```
 
 **stderr**:
@@ -106,15 +94,14 @@ Error: No valid gallery entries found in empty/
 ## Behavioral Contract
 
 ### Execution Order
-1. Validate output path (fail fast if invalid)
-2. Scan gallery directory
-3. Validate each entry (skip invalid, log warnings)
-4. Execute entries sequentially
-5. Generate markdown
-6. Write output file
+1. Scan gallery directory
+2. Validate each entry (skip invalid, log warnings)
+3. Execute entries sequentially
+4. Generate markdown
+5. Write to README.md in current directory
 
 ### Error Handling
-- **Fatal errors** (exit 1): Invalid output path, no entries found, write failures
+- **Fatal errors** (exit 1): No entries found, write failures to README.md
 - **Non-fatal errors** (warnings, continue): Individual entry execution failures
 
 ### Idempotency
@@ -125,7 +112,7 @@ Error: No valid gallery entries found in empty/
 ### File System Effects
 - Reads from: `<gallery-dir>/*/{setup.sh,command.sh,metadata.json}`
 - Writes to: `<gallery-dir>/*/{.duct/,plots/}` (via duct/con-duct execution)
-- Writes to: `<output-path>` (markdown file)
+- Writes to: `README.md` in current working directory
 
 ### Performance Expectations
 - Total time = sum of all entry execution times + tool overhead

@@ -12,11 +12,11 @@ pip install .
 
 ## Basic Usage
 ```bash
-# Execute all gallery entries and generate markdown
-python -m src.gallery_render -o gallery.md
+# Execute all gallery entries and generate README.md
+con-duct-gallery
 
 # Specify custom gallery directory
-python -m src.gallery_render -o output.md --gallery-dir /path/to/gallery
+con-duct-gallery --gallery-dir /path/to/gallery
 ```
 
 ## Integration Test Scenarios
@@ -28,14 +28,14 @@ python -m src.gallery_render -o output.md --gallery-dir /path/to/gallery
 - `gallery/example-2/setup.sh` (prepares environment)
 - `gallery/example-2/command.sh` contains `datalad run -m "example 2" duct -- sleep 5`
 
-**When**: Run `python -m src.gallery_render -o test-output.md`
+**When**: Run `con-duct-gallery`
 
 **Then**:
 - For each entry:
   - setup.sh is executed
   - command.sh is executed (produces .duct/usage.json)
   - Plot generated from usage.json using con-duct
-- `test-output.md` is created
+- `README.md` is created in current directory
 - File contains 2 entry sections
 - Each section has heading, bash code block with command, embedded plot
 - Images use relative paths from test-output.md location
@@ -43,18 +43,18 @@ python -m src.gallery_render -o output.md --gallery-dir /path/to/gallery
 **Validation**:
 ```bash
 # Check duct outputs exist
-test -f gallery/example-1/.duct/usage.json
-test -f gallery/example-2/.duct/usage.json
+test -f gallery/example-1/.duct/*info.json
+test -f gallery/example-2/.duct/*info.json
 
 # Check plots generated
 test -f gallery/example-1/plots/*.png
 test -f gallery/example-2/plots/*.png
 
 # Check markdown structure
-test -f test-output.md
-grep -c "^## Entry:" test-output.md  # Should output: 2
-grep -c "\`\`\`bash" test-output.md  # Should output: 2
-grep -c "!\[Plot\]" test-output.md   # Should output: 2
+test -f README.md
+grep -c "^## Entry:" README.md  # Should output: 2
+grep -c "\`\`\`bash" README.md  # Should output: 2
+grep -c "!\[Plot\]" README.md   # Should output: 2
 ```
 
 ---
@@ -64,7 +64,7 @@ grep -c "!\[Plot\]" test-output.md   # Should output: 2
 - `gallery/bad-setup/setup.sh` exits with error code 1
 - `gallery/bad-setup/command.sh` exists
 
-**When**: Run `python -m src.gallery_render -o test-output.md`
+**When**: Run `con-duct-gallery`
 
 **Then**:
 - Error logged: "Entry 'bad-setup' failed: setup.sh exited with code 1"
@@ -74,7 +74,7 @@ grep -c "!\[Plot\]" test-output.md   # Should output: 2
 
 **Validation**:
 ```bash
-! grep "bad-setup" test-output.md
+! grep "bad-setup" README.md
 ```
 
 ---
@@ -84,7 +84,7 @@ grep -c "!\[Plot\]" test-output.md   # Should output: 2
 - `gallery/bad-command/setup.sh` succeeds
 - `gallery/bad-command/command.sh` contains command that exits with error
 
-**When**: Run `python -m src.gallery_render -o test-output.md`
+**When**: Run `con-duct-gallery`
 
 **Then**:
 - Error logged: "Entry 'bad-command' failed: command execution failed"
@@ -93,33 +93,15 @@ grep -c "!\[Plot\]" test-output.md   # Should output: 2
 
 **Validation**:
 ```bash
-! grep "bad-command" test-output.md
+! grep "bad-command" README.md
 ```
 
 ---
 
-### Scenario 4: Validate output path before execution
-**Given**: Invalid output path `/nonexistent/dir/output.md`
-
-**When**: Run `python -m src.gallery_render -o /nonexistent/dir/output.md`
-
-**Then**:
-- Error message: "Output path invalid: parent directory does not exist"
-- Exit code: 1
-- No commands executed (fail fast)
-
-**Validation**:
-```bash
-python -m src.gallery_render -o /nonexistent/dir/output.md
-test $? -eq 1
-```
-
----
-
-### Scenario 5: Fail if no entries found
+### Scenario 4: Fail if no entries found
 **Given**: Empty gallery directory
 
-**When**: Run `python -m src.gallery_render -o test-output.md --gallery-dir empty_gallery/`
+**When**: Run `con-duct-gallery --gallery-dir empty_gallery/`
 
 **Then**:
 - Error message: "No gallery entries found in empty_gallery/"
@@ -129,19 +111,18 @@ test $? -eq 1
 **Validation**:
 ```bash
 mkdir empty_gallery
-python -m src.gallery_render -o test-output.md --gallery-dir empty_gallery/
+con-duct-gallery --gallery-dir empty_gallery/
 test $? -eq 1
-test ! -f test-output.md
 ```
 
 ---
 
-### Scenario 6: Idempotent generation with datalad run provenance
-**Given**: Gallery with 1 entry using datalad run
+### Scenario 5: Idempotent generation with datalad run provenance
+**Given**: Gallery with entries
 
 **When**:
-1. Run `python -m src.gallery_render -o output1.md`
-2. Run `python -m src.gallery_render -o output2.md`
+1. Run `con-duct-gallery`
+2. Run `con-duct-gallery` again
 
 **Then**:
 - Both executions succeed

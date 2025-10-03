@@ -89,13 +89,15 @@ def process_entry(entry, output_path):
 def main():
     """Main entry point for con-duct-gallery CLI."""
     parser = argparse.ArgumentParser(description="Generate gallery markdown from duct executions")
-    parser.add_argument("-o", "--output", required=True, type=Path, help="Output markdown file path")
     parser.add_argument("--gallery-dir", type=Path, default=Path("./gallery"), help="Gallery directory to scan")
 
     args = parser.parse_args()
 
+    # Output always goes to README.md in current directory
+    output_path = Path("README.md")
+
     # Validate output path
-    if not validate_output_path(args.output):
+    if not validate_output_path(output_path):
         sys.exit(1)
 
     # Discover entries
@@ -111,7 +113,7 @@ def main():
     # Process each entry
     successful_entries = []
     for entry in entries:
-        if process_entry(entry, args.output):
+        if process_entry(entry, output_path):
             successful_entries.append(entry)
 
     if not successful_entries:
@@ -119,11 +121,11 @@ def main():
         sys.exit(1)
 
     # Generate markdown
-    markdown_content = render_markdown(successful_entries, args.output)
+    markdown_content = render_markdown(successful_entries, output_path)
 
     # Write output
-    args.output.write_text(markdown_content)
-    logger.info(f"Generated markdown: {args.output} ({len(successful_entries)} entries)")
+    output_path.write_text(markdown_content)
+    logger.info(f"Generated markdown: {output_path} ({len(successful_entries)} entries)")
 
 
 if __name__ == "__main__":
