@@ -10,7 +10,7 @@ duct -p .duct/run -- bash -c 'for i in {1..5}; do echo "Step $i"; sleep 0.2; don
 exit 0
 ```
 
-![Plot](../tests/fixtures/gallery/example-1/plots/usage.png)
+![Plot](tests/fixtures/gallery/example-1/plots/usage.png)
 
 ---
 
@@ -24,6 +24,6 @@ duct -p .duct/run -- bash -c 'for i in {1..3}; do echo "Processing $i"; sleep 0.
 exit 0
 ```
 
-![Plot](../tests/fixtures/gallery/example-2/plots/usage.png)
+![Plot](tests/fixtures/gallery/example-2/plots/usage.png)
 
 ---
